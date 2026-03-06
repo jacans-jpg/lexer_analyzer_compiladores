@@ -4,6 +4,7 @@ from tkinter import ttk, filedialog, messagebox
 from src.providers.file_reader import FileReaderProvider
 from src.services.file_reader_services import FileReaderService
 from src.services.lexer_service import LexerService
+from src.providers.parser_provider import ParserProvider
 
 
 class LexerGUI:
@@ -16,12 +17,14 @@ class LexerGUI:
         self.crear_componentes()
 
     def crear_componentes(self):
+
+        # CODIGO FUENTE
         tk.Label(self.root, text="Código Fuente").pack()
 
         self.code_text = tk.Text(self.root, height=10)
         self.code_text.pack(fill="x", padx=10, pady=5)
 
-        # Botones
+        # BOTONES
         button_frame = tk.Frame(self.root)
         button_frame.pack(pady=5)
 
@@ -37,46 +40,55 @@ class LexerGUI:
         ttk.Button(button_frame, text="Limpiar",
                    command=self.limpiar).pack(side="left", padx=5)
 
-        tk.Label(self.root, text="Tokens").pack()
+        # NOTEBOOK (PESTAÑAS)
+        notebook = ttk.Notebook(self.root)
+        notebook.pack(fill="both", expand=True, padx=10, pady=10)
+
+        
+        # PESTAÑA TOKENS
+        frame_tokens = ttk.Frame(notebook)
+        notebook.add(frame_tokens, text="Tokens")
 
         self.token_table = ttk.Treeview(
-            self.root,
+            frame_tokens,
             columns=("Lexema", "Token"),
-            show="headings",
-            height=8
+            show="headings"
         )
 
         self.token_table.heading("Lexema", text="Lexema")
         self.token_table.heading("Token", text="Token")
 
-        self.token_table.pack(fill="both", expand=True,
-                              padx=10, pady=5)
+        self.token_table.pack(fill="both", expand=True, padx=10, pady=10)
 
-        tk.Label(self.root, text="Tabla de Símbolos").pack()
+        # PESTAÑA TABLA DE SIMBOLOS
+        frame_symbols = ttk.Frame(notebook)
+        notebook.add(frame_symbols, text="Tabla de Símbolos")
 
         self.symbol_table = ttk.Treeview(
-            self.root,
-            columns=("Identificador", "Tipo",
-                     "Linea", "Columna"),
-            show="headings",
-            height=6
+            frame_symbols,
+            columns=("Identificador", "Tipo", "Linea", "Columna"),
+            show="headings"
         )
 
-        self.symbol_table.heading("Identificador",
-                                  text="Identificador")
+        self.symbol_table.heading("Identificador", text="Identificador")
         self.symbol_table.heading("Tipo", text="Tipo")
         self.symbol_table.heading("Linea", text="Línea")
         self.symbol_table.heading("Columna", text="Columna")
 
-        self.symbol_table.pack(fill="both", expand=True,
-                               padx=10, pady=5)
+        self.symbol_table.pack(fill="both", expand=True, padx=10, pady=10)
 
-        tk.Label(self.root, text="Errores Léxicos").pack()
+        
+        # PESTAÑA ERRORES
+        frame_errors = ttk.Frame(notebook)
+        notebook.add(frame_errors, text="Errores Léxicos")
 
-        self.error_text = tk.Text(self.root, height=5, fg="red")
-        self.error_text.pack(fill="x", padx=10, pady=5)
+        self.error_text = tk.Text(frame_errors, fg="red")
+        self.error_text.pack(fill="both", expand=True, padx=10, pady=10)
 
+
+    # ABRIR ARCHIVO
     def abrir_archivo(self):
+
         ruta = filedialog.askopenfilename(
             filetypes=[("Archivos TXT", "*.txt")]
         )
@@ -91,6 +103,8 @@ class LexerGUI:
         self.code_text.delete("1.0", tk.END)
         self.code_text.insert(tk.END, contenido)
 
+
+    # ANALIZAR CODIGO
     def analizar(self):
 
         codigo = self.code_text.get("1.0", tk.END)
@@ -98,6 +112,10 @@ class LexerGUI:
         lexer = LexerService(codigo)
         tokens = lexer.tokenizar()
 
+        parser = ParserProvider()
+        parser.parse(codigo)
+
+        # limpiar tablas
         for row in self.token_table.get_children():
             self.token_table.delete(row)
 
@@ -106,7 +124,11 @@ class LexerGUI:
 
         self.error_text.delete("1.0", tk.END)
 
+        
+        # MOSTRAR TOKENS
+        
         for token in tokens:
+
             token_str = str(token)
 
             if "(" in token_str and ")" in token_str:
@@ -122,8 +144,13 @@ class LexerGUI:
                 values=(lexema, tipo)
             )
 
+        
+        # TABLA DE SIMBOLOS
+        
         if hasattr(lexer, "tabla_simbolos"):
+
             for simbolo in lexer.tabla_simbolos:
+
                 try:
                     self.symbol_table.insert(
                         "",
@@ -135,7 +162,9 @@ class LexerGUI:
                             simbolo.columna
                         )
                     )
+
                 except:
+
                     self.symbol_table.insert(
                         "",
                         "end",
@@ -147,10 +176,19 @@ class LexerGUI:
                         )
                     )
 
-        if hasattr(lexer, "errores"):
-            for error in lexer.errores:
+        
+        # ERRORES LEXICOS / PARSER
+        
+        if hasattr(parser, "errors") and parser.errors:
+
+            for error in parser.errors:
                 self.error_text.insert(tk.END, f"{error}\n")
 
+        else:
+            self.error_text.insert(tk.END, "Sin errores léxicos.\n")
+
+    
+    # EXPORTAR RESULTADOS
     def exportar(self):
 
         ruta = filedialog.asksaveasfilename(
@@ -185,6 +223,9 @@ class LexerGUI:
             "Archivo exportado correctamente"
         )
 
+    
+    # LIMPIAR
+    
     def limpiar(self):
 
         self.code_text.delete("1.0", tk.END)
@@ -197,7 +238,11 @@ class LexerGUI:
             self.symbol_table.delete(row)
 
 
+
+# EJECUTAR INTERFAZ
+
 if __name__ == "__main__":
+
     root = tk.Tk()
     app = LexerGUI(root)
     root.mainloop()
