@@ -1,18 +1,21 @@
-public class Persona {
-    String nombre;
-    int edad;
+public class Dog {
+    privada String name;
+    privada int age;
 
-    public Persona(String nombre, int edad) {
-        this.nombre = nombre;
-        this.edad = edad;
+    public Dog(String name, int age) {
+        this.name = name; 
+        this.age = age;
     }
 
-    public void saludar() {
-        System.out.println("Hola, me llamo " + nombre + " y tengo " + edad + " años.");
+    public void bark() {
+        System.out.println(name + " says woof!");
     }
 
-    public static void main(String[] args) {
-        Persona persona1 = new Persona("Robert", 17);
-        persona1.saludar();
+    public static void main(String args) {
+        Dog dog1 = new Dog("Nimbus", 2);
+        Dog dog2 = new Dog("Lucy", 4);
+
+        dog1.bark();
+        dog2.bark();
     }
 }

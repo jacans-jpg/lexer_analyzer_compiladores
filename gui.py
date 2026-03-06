@@ -16,8 +16,6 @@ class LexerGUI:
         self.crear_componentes()
 
     def crear_componentes(self):
-
-        # Código fuente
         tk.Label(self.root, text="Código Fuente").pack()
 
         self.code_text = tk.Text(self.root, height=10)
@@ -39,7 +37,6 @@ class LexerGUI:
         ttk.Button(button_frame, text="Limpiar",
                    command=self.limpiar).pack(side="left", padx=5)
 
-        # Tabla Tokens
         tk.Label(self.root, text="Tokens").pack()
 
         self.token_table = ttk.Treeview(
@@ -55,7 +52,6 @@ class LexerGUI:
         self.token_table.pack(fill="both", expand=True,
                               padx=10, pady=5)
 
-        # Tabla Símbolos
         tk.Label(self.root, text="Tabla de Símbolos").pack()
 
         self.symbol_table = ttk.Treeview(
@@ -75,15 +71,11 @@ class LexerGUI:
         self.symbol_table.pack(fill="both", expand=True,
                                padx=10, pady=5)
 
-        # Errores
         tk.Label(self.root, text="Errores Léxicos").pack()
 
         self.error_text = tk.Text(self.root, height=5, fg="red")
         self.error_text.pack(fill="x", padx=10, pady=5)
 
-    # ==========================
-    # ABRIR ARCHIVO
-    # ==========================
     def abrir_archivo(self):
         ruta = filedialog.askopenfilename(
             filetypes=[("Archivos TXT", "*.txt")]
@@ -99,9 +91,6 @@ class LexerGUI:
         self.code_text.delete("1.0", tk.END)
         self.code_text.insert(tk.END, contenido)
 
-    # ==========================
-    # ANALIZAR
-    # ==========================
     def analizar(self):
 
         codigo = self.code_text.get("1.0", tk.END)
@@ -109,7 +98,6 @@ class LexerGUI:
         lexer = LexerService(codigo)
         tokens = lexer.tokenizar()
 
-        # Limpiar tablas
         for row in self.token_table.get_children():
             self.token_table.delete(row)
 
@@ -118,7 +106,6 @@ class LexerGUI:
 
         self.error_text.delete("1.0", tk.END)
 
-        # Tokens
         for token in tokens:
             token_str = str(token)
 
@@ -135,11 +122,8 @@ class LexerGUI:
                 values=(lexema, tipo)
             )
 
-        # Tabla símbolos
         if hasattr(lexer, "tabla_simbolos"):
             for simbolo in lexer.tabla_simbolos:
-
-                # Si es objeto
                 try:
                     self.symbol_table.insert(
                         "",
@@ -151,7 +135,6 @@ class LexerGUI:
                             simbolo.columna
                         )
                     )
-                # Si es diccionario
                 except:
                     self.symbol_table.insert(
                         "",
@@ -164,14 +147,10 @@ class LexerGUI:
                         )
                     )
 
-        # Errores
         if hasattr(lexer, "errores"):
             for error in lexer.errores:
                 self.error_text.insert(tk.END, f"{error}\n")
 
-    # ==========================
-    # EXPORTAR
-    # ==========================
     def exportar(self):
 
         ruta = filedialog.asksaveasfilename(
@@ -206,9 +185,6 @@ class LexerGUI:
             "Archivo exportado correctamente"
         )
 
-    # ==========================
-    # LIMPIAR
-    # ==========================
     def limpiar(self):
 
         self.code_text.delete("1.0", tk.END)

@@ -19,16 +19,24 @@ TOKEN_REGEX = [
     ('MULTIPLICACION',            r'\*'),
     ('DIVISION',             r'/'),
 
-    ('PARENTESIS_IZQUIERDO',          r'\('),
-    ('PARENTESIS_DERECHO',          r'\)'),
-    ('LLAVE_DERECHA',          r'\{'),
-    ('LLAVE_IZQUIERDA',          r'\}'),
-    ('DOS_PUNTOS',       r';'),
-    ('COMA',           r','),
     ('ESPACIO',      r'\s+'),
 ]
 
 KEYWORDS = {
-    'if', 'else', 'while', 'for', 'return',
-    'int', 'float', 'string', 'bool'
+    "abstract","assert","boolean","break","byte",
+    "case","catch","char","class","const",
+    "continue","default","do","double",
+    "else","enum","extends",
+    "final","finally","float","for",
+    "goto",
+    "if","implements","import","instanceof","int","interface",
+    "long",
+    "native","new",
+    "package","private","protected","public",
+    "return",
+    "short","static","strictfp","super","switch","synchronized",
+    "this","throw","throws","transient","try",
+    "void","volatile","while", "String", "System", "out", "println"
 }
+
+LITERALS = {"true", "false", "null"}
